@@ -1,4 +1,5 @@
 import json
+import pytest # type: ignore
 
 def test_health(client):
     res = client.get("/health")
@@ -44,6 +45,14 @@ def test_pictures_json_is_not_empty(client):
 
 def test_post_picture(picture, client):
     # create a brand new picture to upload
+    picture = {
+        "id": 200,
+        "pic_url": "http://dummyimage.com/230x100.png/dddddd/000000",
+        "event_country": "United States",
+        "event_state": "California",
+        "event_city": "Fremont",
+        "event_date": "11/2/2030"
+    }
     res = client.post("/picture", data=json.dumps(picture),
                       content_type="application/json")
     assert res.status_code == 201
@@ -54,10 +63,18 @@ def test_post_picture(picture, client):
 
 def test_post_picture_duplicate(picture, client):
     # create a brand new picture to upload
+    picture = {
+        "id": 200,
+        "pic_url": "http://dummyimage.com/230x100.png/dddddd/000000",
+        "event_country": "United States",
+        "event_state": "California",
+        "event_city": "Fremont",
+        "event_date": "11/2/2030"
+    }
     res = client.post("/picture", data=json.dumps(picture),
                       content_type="application/json")
     assert res.status_code == 302
-    assert res.json['Message'] == f"picture with id {picture['id']} already present"
+    assert res.json['message'] == f"Picture with id {picture['id']} already present"
 
 def test_update_picture_by_id(client, picture):
     id = '2'
@@ -74,6 +91,16 @@ def test_update_picture_by_id(client, picture):
     assert res.json['event_state'] == new_state
 
 def test_delete_picture_by_id(client):
+    picture = {
+        "id": 200,
+        "pic_url": "http://dummyimage.com/230x100.png/dddddd/000000",
+        "event_country": "United States",
+        "event_state": "California",
+        "event_city": "Fremont",
+        "event_date": "11/2/2030"
+    }
+    res = client.post("/picture", data=json.dumps(picture),
+                      content_type="application/json")
     res = client.get("/count")
     assert res.json['length'] == 11
     res = client.delete("/picture/1")
